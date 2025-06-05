@@ -8,37 +8,21 @@ Original file is located at
 """
 
 import streamlit as st
-import openai
+from openai import OpenAI
 
-st.set_page_config(page_title="MBTI 聊天分析器", page_icon="🧠")
+client = OpenAI()
 
-# 讀取 OpenAI API 金鑰（部署時建議用 secrets）
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+st.title("MBTI 聊天預測")
 
-st.title("🧠 MBTI 聊天分析器")
-st.markdown("和我聊聊，我將根據你的回答預測你的 MBTI 類型！")
+user_input = st.text_input("請輸入你的問題或聊天內容：")
 
-# 初始化對話
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "system", "content": "你是一位擅長人格判斷的心理師，會根據使用者的回答逐步預測其 MBTI 類型。請以自然聊天方式互動，避免直接給出結果。"}
-    ]
-
-# 顯示歷史聊天紀錄
-for msg in st.session_state.messages[1:]:
-    st.chat_message(msg["role"]).write(msg["content"])
-
-# 使用者輸入
-if user_input := st.chat_input("輸入訊息開始聊天..."):
-    st.chat_message("user").write(user_input)
-    st.session_state.messages.append({"role": "user", "content": user_input})
-
-    # 呼叫 GPT API
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=st.session_state.messages
+if user_input:
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "你是一個可以判斷使用者 MBTI 類型的聊天助手。"},
+            {"role": "user", "content": user_input}
+        ]
     )
-
-    reply = response.choices[0].message.content
-    st.chat_message("assistant").write(reply)
-    st.session_state.messages.append({"role": "assistant", "content": reply})
+    st.write("模型回覆：")
+    st.write(response.choices[0].message.content)
