@@ -1,16 +1,15 @@
 import streamlit as st
 import requests
-import json
 
-st.title("MBTI 對話預測（Hugging Face）")
+st.title("MBTI 對話預測（使用 Hugging Face）")
 
 user_input = st.text_input("請輸入一段自然對話：")
 
 if user_input:
-    API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+    API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-large"
     headers = {"Authorization": f"Bearer {st.secrets['HF_API_KEY']}"}
     payload = {
-        "inputs": f"以下是對話內容：{user_input}，請猜測說話者可能的 MBTI 類型並簡要解釋。",
+        "inputs": f"以下對話描述一個人的行為與想法，請猜測這個人可能的 MBTI 類型並簡要說明原因：{user_input}",
         "parameters": {"max_new_tokens": 100}
     }
 
@@ -20,12 +19,10 @@ if user_input:
         if response.status_code == 200:
             try:
                 result = response.json()
-                output = result[0]["generated_text"]
                 st.subheader("模型回應：")
-                st.write(output)
-            except Exception as e:
-                st.error("⚠️ JSON 解碼錯誤，可能模型尚未啟動或回傳格式錯誤。")
-                st.text("回傳原始內容：")
+                st.write(result[0]["generated_text"])
+            except Exception:
+                st.error("⚠️ 模型回傳格式無法解析")
                 st.code(response.text)
         else:
             st.error(f"❌ 錯誤狀態碼：{response.status_code}")
