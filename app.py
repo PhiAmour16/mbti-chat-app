@@ -6,7 +6,7 @@ st.title("MBTI 對話預測（ChatYuan v2）")
 user_input = st.text_input("請輸入一段自然對話內容：")
 
 if user_input:
-    API_URL = "https://api-inference.huggingface.co/models/ClueAI/ChatYuan-large"
+    API_URL = "https://api-inference.huggingface.co/models/ClueAI/ChatYuan-large-v2"
     headers = {
         "Authorization": f"Bearer {st.secrets['HF_API_KEY']}"
     }
