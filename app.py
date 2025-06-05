@@ -1,35 +1,28 @@
 import streamlit as st
 import requests
 
-st.title("MBTI 對話預測（ChatYuan v2）")
+st.title("GPT-4o 測試應用程式")
 
-user_input = st.text_input("請輸入一段自然對話內容：")
+user_input = st.text_input("請輸入您的問題：")
 
 if user_input:
-    API_URL = "https://api-inference.huggingface.co/models/ClueAI/ChatYuan-large-v2"
     headers = {
-        "Authorization": f"Bearer {st.secrets['HF_API_KEY']}"
+        "Authorization": f"Bearer {st.secrets['GITHUB_API_TOKEN']}",
+        "Content-Type": "application/json"
     }
-
-    # 指令提示語，加強任務導向（MBTI 預測）
-    prompt = f"根據這段中文對話，請猜測這個人的 MBTI 類型並簡要說明原因：{user_input}"
 
     payload = {
-        "inputs": prompt,
-        "parameters": {"max_new_tokens": 100}
+        "inputs": user_input,
+        "parameters": {
+            "temperature": 0.7,
+            "max_tokens": 100
+        }
     }
 
-    with st.spinner("思考中..."):
-        response = requests.post(API_URL, headers=headers, json=payload)
+    response = requests.post(st.secrets["MODEL_API_URL"], headers=headers, json=payload)
 
-        if response.status_code == 200:
-            try:
-                result = response.json()
-                st.subheader("模型回應：")
-                st.write(result[0]["generated_text"])
-            except Exception as e:
-                st.error("⚠️ 模型回傳格式解析失敗。")
-                st.code(response.text)
-        else:
-            st.error(f"❌ API 錯誤，狀態碼：{response.status_code}")
-            st.code(response.text)
+    if response.status_code == 200:
+        result = response.json()
+        st.write(result.get("generated_text", "未取得回應"))
+    else:
+        st.error(f"API 請求失敗，狀態碼：{response.status_code}")
