@@ -1,3 +1,17 @@
+headers = {
+    "Authorization": f"Bearer {st.secrets['GITHUB_API_TOKEN']}",
+    "Content-Type": "application/json"
+}
+
+payload = {
+    "model": "gpt-4o",
+    "messages": [
+        {"role": "user", "content": user_input}
+    ],
+    "temperature": 0.7,
+    "max_tokens": 100
+}
+
 import streamlit as st
 import requests
 
