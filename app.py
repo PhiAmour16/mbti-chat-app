@@ -74,14 +74,17 @@ if st.button("🔍 預測 MBTI 類型"):
     else:
         with st.spinner("MBTI 正在預測中..."):
             analysis_prompt = [
-                {"role": "system", "content": "你是一個心理學專家，擅長根據對話內容推測說話者的 MBTI 類型。請只輸出四字 MBTI 類型（如 INFP、ESTJ），不需多餘說明。"},
-                {"role": "user", "content": "以下是使用者與 AI 的完整對話，請預測使用者的 MBTI 類型：\n" + "\n".join([m["content"] for m in user_msgs])}
+                {"role": "system", "content": (
+                    "你是一個心理學專家，擅長根據對話內容推測說話者的 MBTI 類型。"
+                    "請先輸出四字 MBTI 類型（如 INFP、ESTJ），接著換行並簡短說明你為何做此推測。"
+                )},
+                {"role": "user", "content": "以下是使用者與 AI 的完整對話，請預測使用者的 MBTI 類型並說明理由：\n" + "\n".join([m["content"] for m in user_msgs])}
             ]
             mbti_payload = {
                 "model": "gpt-4o",
                 "messages": analysis_prompt,
                 "temperature": 0.3,
-                "max_tokens": 10
+                "max_tokens": 150
             }
             mbti_response = requests.post(
                 "https://api.openai.com/v1/chat/completions",
@@ -92,11 +95,18 @@ if st.button("🔍 預測 MBTI 類型"):
                 json=mbti_payload
             )
             if mbti_response.status_code == 200:
-                st.session_state.mbti_guess = mbti_response.json()["choices"][0]["message"]["content"].strip()
+                full_text = mbti_response.json()["choices"][0]["message"]["content"].strip()
+                # 嘗試分離第一行作為MBTI，剩下作為說明
+                lines = full_text.split("\n", 1)
+                st.session_state.mbti_guess = lines[0].strip()
+                st.session_state.mbti_explanation = lines[1].strip() if len(lines) > 1 else ""
             else:
                 st.error(f"MBTI 預測 API 請求失敗：{mbti_response.status_code}")
 
-# 顯示 MBTI 推測結果
+# 顯示 MBTI 推測結果和說明
 st.divider()
 st.subheader("🔍 目前推測的 MBTI 類型")
 st.markdown(f"**{st.session_state.mbti_guess}**")
+
+if "mbti_explanation" in st.session_state and st.session_state.mbti_explanation:
+    st.markdown(f"📖 **推測說明:**  {st.session_state.mbti_explanation}")
