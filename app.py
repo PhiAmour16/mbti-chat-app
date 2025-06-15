@@ -76,6 +76,9 @@ if st.button("🔍 預測 MBTI 類型"):
             analysis_prompt = [
                 {"role": "system", "content": (
                     "你是一個心理學專家，擅長根據對話內容推測說話者的 MBTI 類型。"
+                    "你是一個友善的聊天助手，請自然地與使用者聊天。"
+                    "不要提及 MBTI、人格類型、外向、內向、思考、感覺等字眼，"
+                    "也不要引導使用者朝特定方向回答。"
                     "請先輸出四字 MBTI 類型（如 INFP、ESTJ），接著換行並簡短說明你為何做此推測。"
                 )},
                 {"role": "user", "content": "以下是使用者與 AI 的完整對話，請預測使用者的 MBTI 類型並說明理由：\n" + "\n".join([m["content"] for m in user_msgs])}
