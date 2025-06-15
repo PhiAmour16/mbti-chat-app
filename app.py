@@ -65,7 +65,7 @@ if user_input:
 user_msgs = [m for m in st.session_state.messages if m["role"] == "user"]
 st.markdown(f"🗣️ 已輸入句數：{len(user_msgs)}")
 if len(user_msgs) < 5:
-    st.info("📌 建議與 AI 多聊幾句（至少 5 句）以提高 MBTI 預測準確度。")
+    st.info("📌 建議與 AI 多聊幾句（至少 10 句）以提高 MBTI 預測準確度。")
 
 # 新增「預測 MBTI」按鈕，點擊後呼叫預測API
 if st.button("🔍 預測 MBTI 類型"):
